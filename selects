@@ -1,1 +1,157 @@
+-- =========================
+-- 1. LISTAR TODOS LOS CLIENTES ACTIVOS
+-- =========================
+SELECT
+  id_cliente,
+  nombre,
+  apellido,
+  email,
+  creado_en
+FROM gimnasio.Cliente
+WHERE activo = TRUE
+ORDER BY apellido, nombre;
+
+
+-- =========================
+-- 2. CLIENTES REGISTRADOS ENTRE ENERO Y MARZO 2024
+-- =========================
+SELECT
+  id_cliente,
+  nombre,
+  apellido,
+  creado_en
+FROM gimnasio.Cliente
+WHERE creado_en BETWEEN '2024-01-01' AND '2024-03-31'
+ORDER BY creado_en;
+
+
+-- =========================
+-- 3. INSCRIPCIONES ACTIVAS CON DATOS DEL CLIENTE
+-- =========================
+SELECT
+  i.id_inscripcion,
+  c.nombre || ' ' || c.apellido AS cliente,
+  m.tipo AS membresia,
+  i.fecha_inicio,
+  i.fecha_fin
+FROM gimnasio.Inscripcion i
+JOIN gimnasio.Cliente c ON i.id_cliente = c.id_cliente
+JOIN gimnasio.Membresia m ON i.id_membresia = m.id_membresia
+WHERE i.estado = 'ACTIVA'
+ORDER BY i.fecha_inicio;
+
+
+-- =========================
+-- 4. PAGOS REALIZADOS ENTRE ENERO Y MARZO 2024
+-- =========================
+SELECT
+  p.id_pago,
+  c.nombre || ' ' || c.apellido AS cliente,
+  p.fecha_pago,
+  p.monto,
+  p.metodo_pago
+FROM gimnasio.Pago p
+JOIN gimnasio.Inscripcion i ON p.id_inscripcion = i.id_inscripcion
+JOIN gimnasio.Cliente c ON i.id_cliente = c.id_cliente
+WHERE p.fecha_pago BETWEEN '2024-01-01' AND '2024-03-31'
+ORDER BY p.fecha_pago;
+
+
+-- =========================
+-- 5. TOTAL DE INGRESOS POR MES
+-- =========================
+SELECT
+  TO_CHAR(p.fecha_pago, 'YYYY-MM') AS mes,
+  SUM(p.monto) AS total_ingresos
+FROM gimnasio.Pago p
+GROUP BY mes
+ORDER BY mes;
+
+
+-- =========================
+-- 6. CLIENTES CON MÁS PAGOS REALIZADOS
+-- =========================
+SELECT
+  c.nombre || ' ' || c.apellido AS cliente,
+  COUNT(p.id_pago) AS cantidad_pagos
+FROM gimnasio.Cliente c
+JOIN gimnasio.Inscripcion i ON c.id_cliente = i.id_cliente
+JOIN gimnasio.Pago p ON i.id_inscripcion = p.id_inscripcion
+GROUP BY cliente
+ORDER BY cantidad_pagos DESC;
+
+
+-- =========================
+-- 7. MEMBRESÍA MÁS CONTRATADA
+-- =========================
+SELECT
+  m.tipo,
+  COUNT(i.id_inscripcion) AS total_contratos
+FROM gimnasio.Membresia m
+JOIN gimnasio.Inscripcion i ON m.id_membresia = i.id_membresia
+GROUP BY m.tipo
+ORDER BY total_contratos DESC;
+
+
+-- =========================
+-- 8. INGRESOS TOTALES POR TIPO DE MEMBRESÍA
+-- =========================
+SELECT
+  m.tipo,
+  SUM(p.monto) AS total_ingresos
+FROM gimnasio.Membresia m
+JOIN gimnasio.Inscripcion i ON m.id_membresia = i.id_membresia
+JOIN gimnasio.Pago p ON i.id_inscripcion = p.id_inscripcion
+GROUP BY m.tipo
+ORDER BY total_ingresos DESC;
+
+
+-- =========================
+-- 9. CLASES CON SU ENTRENADOR
+-- =========================
+SELECT
+  cl.nombre AS clase,
+  cl.horario,
+  e.nombre AS entrenador,
+  cl.cupo_maximo
+FROM gimnasio.Clase cl
+JOIN gimnasio.Entrenador e ON cl.id_entrenador = e.id_entrenador
+ORDER BY cl.horario;
+
+
+-- =========================
+-- 10. CANTIDAD DE CLASES POR ENTRENADOR
+-- =========================
+SELECT
+  e.nombre AS entrenador,
+  COUNT(cl.id_clase) AS cantidad_clases
+FROM gimnasio.Entrenador e
+LEFT JOIN gimnasio.Clase cl ON e.id_entrenador = cl.id_entrenador
+GROUP BY e.nombre
+ORDER BY cantidad_clases DESC;
+
+
+-- =========================
+-- 11. CLIENTES SIN PAGOS REGISTRADOS
+-- =========================
+SELECT
+  c.id_cliente,
+  c.nombre,
+  c.apellido
+FROM gimnasio.Cliente c
+LEFT JOIN gimnasio.Inscripcion i ON c.id_cliente = i.id_cliente
+LEFT JOIN gimnasio.Pago p ON i.id_inscripcion = p.id_inscripcion
+WHERE p.id_pago IS NULL;
+
+
+-- =========================
+-- 12. INSCRIPCIONES VENCIDAS A LA FECHA ACTUAL
+-- =========================
+SELECT
+  i.id_inscripcion,
+  c.nombre || ' ' || c.apellido AS cliente,
+  i.fecha_fin
+FROM gimnasio.Inscripcion i
+JOIN gimnasio.Cliente c ON i.id_cliente = c.id_cliente
+WHERE i.fecha_fin < CURRENT_DATE;
 
