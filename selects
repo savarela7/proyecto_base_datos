@@ -7,7 +7,7 @@ SELECT
   apellido,
   email,
   creado_en
-FROM gimnasio.Cliente
+FROM svarela.Cliente
 WHERE activo = TRUE
 ORDER BY apellido, nombre;
 
@@ -20,7 +20,7 @@ SELECT
   nombre,
   apellido,
   creado_en
-FROM gimnasio.Cliente
+FROM svarela.Cliente
 WHERE creado_en BETWEEN '2024-01-01' AND '2024-03-31'
 ORDER BY creado_en;
 
@@ -34,9 +34,9 @@ SELECT
   m.tipo AS membresia,
   i.fecha_inicio,
   i.fecha_fin
-FROM gimnasio.Inscripcion i
-JOIN gimnasio.Cliente c ON i.id_cliente = c.id_cliente
-JOIN gimnasio.Membresia m ON i.id_membresia = m.id_membresia
+FROM svarela.Inscripcion i
+JOIN svarela.Cliente c ON i.id_cliente = c.id_cliente
+JOIN svarela.Membresia m ON i.id_membresia = m.id_membresia
 WHERE i.estado = 'ACTIVA'
 ORDER BY i.fecha_inicio;
 
@@ -50,9 +50,9 @@ SELECT
   p.fecha_pago,
   p.monto,
   p.metodo_pago
-FROM gimnasio.Pago p
-JOIN gimnasio.Inscripcion i ON p.id_inscripcion = i.id_inscripcion
-JOIN gimnasio.Cliente c ON i.id_cliente = c.id_cliente
+FROM svarela.Pago p
+JOIN svarela.Inscripcion i ON p.id_inscripcion = i.id_inscripcion
+JOIN svarela.Cliente c ON i.id_cliente = c.id_cliente
 WHERE p.fecha_pago BETWEEN '2024-01-01' AND '2024-03-31'
 ORDER BY p.fecha_pago;
 
@@ -63,7 +63,7 @@ ORDER BY p.fecha_pago;
 SELECT
   TO_CHAR(p.fecha_pago, 'YYYY-MM') AS mes,
   SUM(p.monto) AS total_ingresos
-FROM gimnasio.Pago p
+FROM svarela.Pago p
 GROUP BY mes
 ORDER BY mes;
 
@@ -74,9 +74,9 @@ ORDER BY mes;
 SELECT
   c.nombre || ' ' || c.apellido AS cliente,
   COUNT(p.id_pago) AS cantidad_pagos
-FROM gimnasio.Cliente c
-JOIN gimnasio.Inscripcion i ON c.id_cliente = i.id_cliente
-JOIN gimnasio.Pago p ON i.id_inscripcion = p.id_inscripcion
+FROM svarela.Cliente c
+JOIN svarela.Inscripcion i ON c.id_cliente = i.id_cliente
+JOIN svarela.Pago p ON i.id_inscripcion = p.id_inscripcion
 GROUP BY cliente
 ORDER BY cantidad_pagos DESC;
 
@@ -87,8 +87,8 @@ ORDER BY cantidad_pagos DESC;
 SELECT
   m.tipo,
   COUNT(i.id_inscripcion) AS total_contratos
-FROM gimnasio.Membresia m
-JOIN gimnasio.Inscripcion i ON m.id_membresia = i.id_membresia
+FROM svarela.Membresia m
+JOIN svarela.Inscripcion i ON m.id_membresia = i.id_membresia
 GROUP BY m.tipo
 ORDER BY total_contratos DESC;
 
@@ -99,9 +99,9 @@ ORDER BY total_contratos DESC;
 SELECT
   m.tipo,
   SUM(p.monto) AS total_ingresos
-FROM gimnasio.Membresia m
-JOIN gimnasio.Inscripcion i ON m.id_membresia = i.id_membresia
-JOIN gimnasio.Pago p ON i.id_inscripcion = p.id_inscripcion
+FROM svarela.Membresia m
+JOIN svarela.Inscripcion i ON m.id_membresia = i.id_membresia
+JOIN svarela.Pago p ON i.id_inscripcion = p.id_inscripcion
 GROUP BY m.tipo
 ORDER BY total_ingresos DESC;
 
@@ -114,8 +114,8 @@ SELECT
   cl.horario,
   e.nombre AS entrenador,
   cl.cupo_maximo
-FROM gimnasio.Clase cl
-JOIN gimnasio.Entrenador e ON cl.id_entrenador = e.id_entrenador
+FROM svarela.Clase cl
+JOIN svarela.Entrenador e ON cl.id_entrenador = e.id_entrenador
 ORDER BY cl.horario;
 
 
@@ -125,8 +125,8 @@ ORDER BY cl.horario;
 SELECT
   e.nombre AS entrenador,
   COUNT(cl.id_clase) AS cantidad_clases
-FROM gimnasio.Entrenador e
-LEFT JOIN gimnasio.Clase cl ON e.id_entrenador = cl.id_entrenador
+FROM svarela.Entrenador e
+LEFT JOIN svarela.Clase cl ON e.id_entrenador = cl.id_entrenador
 GROUP BY e.nombre
 ORDER BY cantidad_clases DESC;
 
@@ -138,9 +138,9 @@ SELECT
   c.id_cliente,
   c.nombre,
   c.apellido
-FROM gimnasio.Cliente c
-LEFT JOIN gimnasio.Inscripcion i ON c.id_cliente = i.id_cliente
-LEFT JOIN gimnasio.Pago p ON i.id_inscripcion = p.id_inscripcion
+FROM svarela.Cliente c
+LEFT JOIN svarela.Inscripcion i ON c.id_cliente = i.id_cliente
+LEFT JOIN svarela.Pago p ON i.id_inscripcion = p.id_inscripcion
 WHERE p.id_pago IS NULL;
 
 
@@ -151,7 +151,6 @@ SELECT
   i.id_inscripcion,
   c.nombre || ' ' || c.apellido AS cliente,
   i.fecha_fin
-FROM gimnasio.Inscripcion i
-JOIN gimnasio.Cliente c ON i.id_cliente = c.id_cliente
+FROM svarela.Inscripcion i
+JOIN svarela.Cliente c ON i.id_cliente = c.id_cliente
 WHERE i.fecha_fin < CURRENT_DATE;
-
