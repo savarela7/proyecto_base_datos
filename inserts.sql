@@ -1,7 +1,7 @@
 -- =========================
 -- CLIENTE (30)
 -- =========================
-INSERT INTO gimnasio.Cliente
+INSERT INTO svarela.Cliente
 (tipo_identificacion, identificacion, nombre, apellido, telefono, email, fecha_nacimiento, creado_en)
 VALUES
 ('CEDULA','2000000001','Juan','Gómez','099900001','juan.gomez@mail.com','1990-01-12','2024-01-02'),
@@ -40,7 +40,7 @@ VALUES
 -- =========================
 -- MEMBRESIA
 -- =========================
-INSERT INTO gimnasio.Membresia (tipo, precio, duracion_meses) VALUES
+INSERT INTO svarela.Membresia (tipo, precio, duracion_meses) VALUES
 ('Mensual',40,1),
 ('Trimestral',110,3),
 ('Semestral',200,6),
@@ -49,7 +49,7 @@ INSERT INTO gimnasio.Membresia (tipo, precio, duracion_meses) VALUES
 -- =========================
 -- ENTRENADOR (8)
 -- =========================
-INSERT INTO gimnasio.Entrenador (nombre, especialidad, telefono) VALUES
+INSERT INTO svarela.Entrenador (nombre, especialidad, telefono) VALUES
 ('Marcos López','Musculación','099800001'),
 ('Luciana Pérez','Cardio','099800002'),
 ('Cristian Álvarez','CrossFit','099800003'),
@@ -62,7 +62,7 @@ INSERT INTO gimnasio.Entrenador (nombre, especialidad, telefono) VALUES
 -- =========================
 -- INSCRIPCION (60)
 -- =========================
-INSERT INTO gimnasio.Inscripcion
+INSERT INTO svarela.Inscripcion
 (id_cliente, id_membresia, fecha_inicio, fecha_fin, estado, creado_en)
 SELECT
   (g % 30) + 1,
@@ -76,7 +76,7 @@ FROM generate_series(1,60) g;
 -- =========================
 -- PAGO (80)
 -- =========================
-INSERT INTO gimnasio.Pago
+INSERT INTO svarela.Pago
 (id_inscripcion, fecha_pago, monto, metodo_pago, creado_en)
 SELECT
   (g % 60) + 1,
@@ -98,7 +98,7 @@ FROM generate_series(1,80) g;
 -- =========================
 -- CLASE (12)
 -- =========================
-INSERT INTO gimnasio.Clase
+INSERT INTO svarela.Clase
 (nombre, horario, id_entrenador, cupo_maximo) VALUES
 ('CrossFit','06:00',3,25),
 ('Yoga','08:00',4,20),
@@ -112,4 +112,3 @@ INSERT INTO gimnasio.Clase
 ('Core','17:00',5,20),
 ('Stretching','16:00',4,15),
 ('Personal','21:00',1,10);
-
