@@ -1,1 +1,24 @@
+WITH clases_por_entrenador AS (
+  SELECT
+    e.id_entrenador,
+    e.nombre AS entrenador,
+    COUNT(c.id_clase) AS total_clases,
+    STRING_AGG(
+      c.nombre || ' (' || c.horario || ')',
+      ', ' ORDER BY c.horario
+    ) AS agenda_clases
+  FROM svarela.Entrenador e
+  LEFT JOIN svarela.Clase c
+    ON e.id_entrenador = c.id_entrenador
+  WHERE e.activo = TRUE
+  GROUP BY
+    e.id_entrenador,
+    e.nombre
+)
 
+SELECT
+  entrenador,
+  total_clases,
+  agenda_clases
+FROM clases_por_entrenador
+ORDER BY total_clases DESC, entrenador;
