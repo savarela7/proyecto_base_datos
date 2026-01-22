@@ -1,1 +1,25 @@
+WITH resumen_membresias AS (
+  SELECT
+    m.id_membresia,
+    m.tipo AS membresia,
+    COUNT(DISTINCT i.id_inscripcion) AS total_inscripciones,
+    COALESCE(SUM(p.monto), 0) AS total_ingresos
+  FROM svarela.Membresia m
+  LEFT JOIN svarela.Inscripcion i
+    ON m.id_membresia = i.id_membresia
+    AND i.estado = 'ACTIVA'
+  LEFT JOIN svarela.Pago p
+    ON i.id_inscripcion = p.id_inscripcion
+  GROUP BY
+    m.id_membresia,
+    m.tipo
+)
 
+SELECT
+  membresia,
+  total_inscripciones,
+  total_ingresos,
+  RANK() OVER (ORDER BY total_inscripciones DESC) AS ranking_inscripciones,
+  RANK() OVER (ORDER BY total_ingresos DESC) AS ranking_ingresos
+FROM resumen_membresias
+ORDER BY ranking_inscripciones, ranking_ingresos;
