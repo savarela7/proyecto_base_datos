@@ -1,1 +1,34 @@
+WITH pagos_por_inscripcion AS (
+  SELECT
+    i.id_inscripcion,
+    c.nombre || ' ' || c.apellido AS cliente,
+    m.tipo AS membresia,
+    m.duracion_meses,
+    m.precio,
+    (m.duracion_meses * m.precio) AS monto_esperado,
+    COALESCE(SUM(p.monto), 0) AS monto_pagado
+  FROM svarela.Inscripcion i
+  JOIN svarela.Cliente c
+    ON i.id_cliente = c.id_cliente
+  JOIN svarela.Membresia m
+    ON i.id_membresia = m.id_membresia
+  LEFT JOIN svarela.Pago p
+    ON i.id_inscripcion = p.id_inscripcion
+  GROUP BY
+    i.id_inscripcion,
+    c.nombre,
+    c.apellido,
+    m.tipo,
+    m.duracion_meses,
+    m.precio
+)
 
+SELECT
+  id_inscripcion,
+  cliente,
+  membresia,
+  monto_esperado,
+  monto_pagado,
+  (monto_pagado - monto_esperado) AS diferencia
+FROM pagos_por_inscripcion
+ORDER BY diferencia;
