@@ -1,1 +1,27 @@
+WITH total_ingresos_cliente AS (
+  SELECT
+    c.id_cliente,
+    c.nombre,
+    c.apellido,
+    c.email,
+    SUM(p.monto) AS total_pagado
+  FROM svarela.Cliente c
+  JOIN svarela.Inscripcion i
+    ON c.id_cliente = i.id_cliente
+  JOIN svarela.Pago p
+    ON i.id_inscripcion = p.id_inscripcion
+  WHERE i.estado = 'ACTIVA'
+  GROUP BY
+    c.id_cliente,
+    c.nombre,
+    c.apellido,
+    c.email
+)
 
+SELECT
+  nombre || ' ' || apellido AS cliente,
+  email,
+  total_pagado
+FROM total_ingresos_cliente
+ORDER BY total_pagado DESC
+LIMIT 5;
