@@ -1,1 +1,32 @@
+WITH inscripciones_mensuales AS (
+  SELECT
+    DATE_TRUNC('month', i.fecha_inicio) AS mes,
+    i.estado,
+    COUNT(*) AS total_inscripciones
+  FROM svarela.Inscripcion i
+  GROUP BY
+    DATE_TRUNC('month', i.fecha_inicio),
+    i.estado
+),
+pagos_mensuales AS (
+  SELECT
+    DATE_TRUNC('month', p.fecha_pago) AS mes,
+    SUM(p.monto) AS total_pagado
+  FROM svarela.Pago p
+  GROUP BY
+    DATE_TRUNC('month', p.fecha_pago)
+)
 
+SELECT
+  im.mes,
+  SUM(CASE WHEN im.estado = 'ACTIVA' THEN im.total_inscripciones ELSE 0 END) AS inscripciones_activas,
+  SUM(CASE WHEN im.estado = 'VENCIDA' THEN im.total_inscripciones ELSE 0 END) AS inscripciones_vencidas,
+  SUM(CASE WHEN im.estado = 'CANCELADA' THEN im.total_inscripciones ELSE 0 END) AS inscripciones_canceladas,
+  COALESCE(pm.total_pagado, 0) AS total_pagado_mes
+FROM inscripciones_mensuales im
+LEFT JOIN pagos_mensuales pm
+  ON im.mes = pm.mes
+GROUP BY
+  im.mes,
+  pm.total_pagado
+ORDER BY im.mes;
