@@ -32,3 +32,46 @@ SELECT
   (monto_pagado - monto_esperado) AS diferencia
 FROM pagos_por_inscripcion
 ORDER BY diferencia;
+
+Version B
+
+WITH pagos_por_inscripcion AS (
+  SELECT
+    i.id_inscripcion,
+    c.nombre || ' ' || c.apellido AS cliente,
+    m.tipo AS membresia,
+    i.fecha_inicio,
+    i.fecha_fin,
+    m.precio,
+    (
+      (EXTRACT(YEAR FROM AGE(i.fecha_fin, i.fecha_inicio)) * 12)
+      + EXTRACT(MONTH FROM AGE(i.fecha_fin, i.fecha_inicio))
+    ) AS meses_calculados,
+    COALESCE(SUM(p.monto), 0) AS monto_pagado
+  FROM svarela.Inscripcion i
+  JOIN svarela.Cliente c
+    ON i.id_cliente = c.id_cliente
+  JOIN svarela.Membresia m
+    ON i.id_membresia = m.id_membresia
+  LEFT JOIN svarela.Pago p
+    ON i.id_inscripcion = p.id_inscripcion
+  GROUP BY
+    i.id_inscripcion,
+    c.nombre,
+    c.apellido,
+    m.tipo,
+    i.fecha_inicio,
+    i.fecha_fin,
+    m.precio
+)
+
+SELECT
+  id_inscripcion,
+  cliente,
+  membresia,
+  meses_calculados,
+  (meses_calculados * precio) AS monto_esperado,
+  monto_pagado,
+  (monto_pagado - (meses_calculados * precio)) AS diferencia
+FROM pagos_por_inscripcion
+ORDER BY diferencia;
